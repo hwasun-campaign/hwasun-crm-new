@@ -1,9 +1,19 @@
 import { ReactNode } from 'react';
 
-export function Card({ children }: { children: ReactNode }) {
-  return <div className="border rounded-xl shadow-md p-4 bg-white">{children}</div>;
+interface CardProps {
+  children: ReactNode;
+  className?: string;
 }
 
-export function CardContent({ children }: { children: ReactNode }) {
-  return <div>{children}</div>;
+export function Card({ children, className }: CardProps) {
+  return <div className={`rounded-xl border bg-white p-4 shadow ${className}`}>{children}</div>;
+}
+
+interface CardContentProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function CardContent({ children, className }: CardContentProps) {
+  return <div className={className}>{children}</div>;
 }
