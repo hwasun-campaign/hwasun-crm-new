@@ -56,10 +56,10 @@ export default function MiniCRM() {
 
       <Card>
         <CardContent className="space-y-2 p-4">
-          <h2 className="text-lg font-semibold">소속별 인원 통계</h2>
-          {Object.entries(affiliationStats).map(([key, count]) => (
-            <p key={key}><strong>{key}:</strong> {count}명</p>
-          ))}
+        <h2 className="text-lg font-semibold">소속별 인원 통계</h2>
+{Object.entries(affiliationStats).map(([key, count]: [string, number]) => (
+  <p key={key}><strong>{key}:</strong> {count}명</p>
+))}  
         </CardContent>
       </Card>
 
