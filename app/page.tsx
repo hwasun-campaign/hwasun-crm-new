@@ -99,7 +99,7 @@ export default function MiniCRM() {
   // group_id → 그룹 이름 변환
   const getGroupName = (id: string) => {
     const group = groups.find((g) => g.id === id);
-    return group ? `${group.name} 조` : '알 수 없음';
+    return group ? `${group.name}` : '알 수 없음';
   };
 
   return (
