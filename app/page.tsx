@@ -57,7 +57,7 @@ export default function MiniCRM() {
 
     const { data, error } = await supabase.from('members').insert([form]);
     if (error) {
-      console.error('등록 에러:', error);
+      console.error('등록 에러:', JSON.stringify(error, null, 2));
       return;
     }
 
