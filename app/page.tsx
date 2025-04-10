@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase'; // ✅ Supabase 가져오기
+import { supabase } from '@/lib/supabase';
 
 type Member = {
   id: string;
@@ -16,11 +16,18 @@ type Member = {
   birth: string;
   address: string;
   affiliation: string;
-  is_member: boolean; // ✅ Supabase 컬럼에 맞춰서 이름 수정
+  is_member: boolean;
+  group_id: string;
+};
+
+type Group = {
+  id: string;
+  name: string;
 };
 
 export default function MiniCRM() {
   const [members, setMembers] = useState<Member[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -28,21 +35,26 @@ export default function MiniCRM() {
     birth: '',
     address: '',
     affiliation: '',
-    is_member: false, // ✅ 여기도 맞춰줌
+    is_member: false,
+    group_id: '',
   });
 
-  // ✅ 데이터 불러오기
+  // ✅ 조직원, 그룹 불러오기
   useEffect(() => {
-    const fetchMembers = async () => {
-      const { data, error } = await supabase.from('members').select('*');
-      if (error) console.error('불러오기 에러:', error);
-      else setMembers(data as Member[]);
+    const fetchData = async () => {
+      const { data: memberData, error: memberError } = await supabase.from('members').select('*');
+      if (memberError) console.error('멤버 불러오기 에러:', memberError);
+      else setMembers(memberData as Member[]);
+
+      const { data: groupData, error: groupError } = await supabase.from('groups').select('*');
+      if (groupError) console.error('그룹 불러오기 에러:', groupError);
+      else setGroups(groupData as Group[]);
     };
 
-    fetchMembers();
+    fetchData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type, checked } = e.target;
     setForm({
       ...form,
@@ -50,22 +62,22 @@ export default function MiniCRM() {
     });
   };
 
-  // ✅ Supabase에 등록
   const addMember = async () => {
-    const { name, phone, role, birth, address, affiliation } = form;
-    if (!name || !phone || !role || !birth || !address || !affiliation) return;
+    const { name, phone, role, birth, address, affiliation, group_id } = form;
+    if (!name || !phone || !role || !birth || !address || !affiliation || !group_id) {
+      alert('모든 항목을 입력해 주세요!');
+      return;
+    }
 
-    const { data, error } = await supabase.from('members').insert([form]);
+    const { error } = await supabase.from('members').insert([form]);
     if (error) {
       console.error('등록 에러:', JSON.stringify(error, null, 2));
       return;
     }
 
-    // 등록 성공 시 목록 다시 불러오기
     const { data: newData } = await supabase.from('members').select('*');
     setMembers(newData as Member[]);
 
-    // 폼 초기화
     setForm({
       name: '',
       phone: '',
@@ -74,6 +86,7 @@ export default function MiniCRM() {
       address: '',
       affiliation: '',
       is_member: false,
+      group_id: '',
     });
   };
 
@@ -98,6 +111,22 @@ export default function MiniCRM() {
           <Input name="birth" placeholder="생년월일 (예: 830515-2)" value={form.birth} onChange={handleChange} />
           <Input name="address" placeholder="주소 (예: 화순군 화순읍 ...)" value={form.address} onChange={handleChange} />
           <Input name="affiliation" placeholder="소속 (예: A조직, B조직 등)" value={form.affiliation} onChange={handleChange} />
+
+          {/* ✅ 그룹 선택 드롭다운 */}
+          <select
+            name="group_id"
+            value={form.group_id}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded"
+          >
+            <option value="">그룹 선택</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+
           <label className="flex items-center space-x-2">
             <Checkbox name="is_member" checked={form.is_member} onChange={handleChange} />
             <span>권리당원 여부</span>
