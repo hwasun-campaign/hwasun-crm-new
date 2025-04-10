@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/lib/supabase';
 
+// 타입 정의
 type Group = {
   id: string;
   name: string;
@@ -36,15 +37,26 @@ export default function MiniCRM() {
     is_member: false,
   });
 
-  // 등록 함수
-  const addMember = async () => {
-    console.log("버튼 눌림 ✅", form);
+  // 🔢 전화번호 자동 하이픈 처리
+  const formatPhone = (value: string) => {
+    const onlyNums = value.replace(/[^0-9]/g, '');
+    if (onlyNums.length <= 3) return onlyNums;
+    if (onlyNums.length <= 7) return onlyNums.replace(/(\d{3})(\d{1,4})/, '$1-$2');
+    return onlyNums.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
+  };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    const newValue = name === 'phone' ? formatPhone(value) : value;
+    setForm({
+      ...form,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : newValue,
+    });
+  };
+
+  const addMember = async () => {
     const { name, phone, role, birth, address, group_id } = form;
-    if (!name || !phone || !role || !birth || !address || !group_id) {
-      console.log("필수 입력값 누락 ❌");
-      return;
-    }
+    if (!name || !phone || !role || !birth || !address || !group_id) return;
 
     const { error } = await supabase.from('members').insert([form]);
     if (error) {
@@ -77,44 +89,29 @@ export default function MiniCRM() {
     fetchData();
   }, []);
 
-  // 입력값 처리
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    setForm({
-      ...form,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
-    });
-  };
-
-  // 소속별 인원 통계
-  const affiliationStats = useMemo(() => {
+  const groupStats = useMemo(() => {
     const stats: Record<string, number> = {};
     members.forEach((m) => {
-      const key = m.group_id;
-      stats[key] = stats[key] ? stats[key] + 1 : 1;
+      const group = groups.find((g) => g.id === m.group_id);
+      const groupName = group?.name ?? '(알 수 없음)';
+      stats[groupName] = (stats[groupName] || 0) + 1;
     });
     return stats;
-  }, [members]);
-
-  // group_id → 그룹 이름 변환
-  const getGroupName = (id: string) => {
-    const group = groups.find((g) => g.id === id);
-    return group ? `${group.name}` : '알 수 없음';
-  };
+  }, [members, groups]);
 
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold text-center">선거 조직용 미니 CRM</h1>
 
-      {/* 등록 폼 */}
       <Card>
         <CardContent className="space-y-4 p-4">
           <Input name="name" placeholder="이름" value={form.name} onChange={handleChange} />
-          <Input name="phone" placeholder="연락처" value={form.phone} onChange={handleChange} />
+          <Input name="phone" placeholder="연락처 (예: 010-1234-5678)" value={form.phone} onChange={handleChange} />
           <Input name="role" placeholder="역할 (예: 동책임자)" value={form.role} onChange={handleChange} />
           <Input name="birth" placeholder="생년월일 (예: 830515-2)" value={form.birth} onChange={handleChange} />
           <Input name="address" placeholder="주소 (예: 화순군 화순읍 ...)" value={form.address} onChange={handleChange} />
 
+          {/* 그룹 선택 드롭다운 */}
           <select
             name="group_id"
             value={form.group_id}
@@ -123,7 +120,7 @@ export default function MiniCRM() {
           >
             <option value="">소속 그룹 선택</option>
             {groups.map((g) => (
-              <option key={g.id} value={g.id}>{g.name} </option>
+              <option key={g.id} value={g.id}>{g.name}</option>
             ))}
           </select>
 
@@ -131,18 +128,16 @@ export default function MiniCRM() {
             <Checkbox name="is_member" checked={form.is_member} onChange={handleChange} />
             <span>권리당원 여부</span>
           </label>
+
           <Button onClick={addMember}>등록</Button>
         </CardContent>
       </Card>
 
-      {/* 소속별 인원 통계 */}
       <Card>
         <CardContent className="space-y-2 p-4">
           <h2 className="text-lg font-semibold">소속별 인원 통계</h2>
-          {Object.entries(affiliationStats).map(([groupId, count]) => (
-            <p key={groupId}>
-              <strong>{getGroupName(groupId)}:</strong> {count}명
-            </p>
+          {Object.entries(groupStats).map(([group, count]) => (
+            <p key={group}><strong>{group}:</strong> {count}명</p>
           ))}
         </CardContent>
       </Card>
