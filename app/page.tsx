@@ -20,8 +20,9 @@ type Member = {
   role: string;
   birth: string;
   address: string;
-  affiliation: string;
+  group_id: string;
   is_member: boolean;
+  group_name?: string;
 };
 
 export default function MiniCRM() {
@@ -33,18 +34,68 @@ export default function MiniCRM() {
     role: '',
     birth: '',
     address: '',
-    affiliation: '',
+    group_id: '',
     is_member: false,
   });
 
-  // 구성원 목록 + 그룹 목록 불러오기
+  const addMember = async () => {
+    console.log("버튼 눌림 ✅", form);
+
+    const { name, phone, role, birth, address, group_id } = form;
+    if (!name || !phone || !role || !birth || !address || !group_id) {
+      console.log("필수 입력값 누락 ❌");
+      return;
+    }
+
+    const { error } = await supabase.from('members').insert([form]);
+    if (error) {
+      console.error('등록 에러:', error);
+      return;
+    }
+
+    const { data: newData } = await supabase
+      .from('members')
+      .select('*, groups(name)')
+      .order('created_at', { ascending: false });
+
+    if (newData) {
+      const mapped = newData.map((m: any) => ({
+        ...m,
+        group_name: m.groups?.name || '',
+      }));
+      setMembers(mapped);
+    }
+
+    setForm({
+      name: '',
+      phone: '',
+      role: '',
+      birth: '',
+      address: '',
+      group_id: '',
+      is_member: false,
+    });
+  };
+
   useEffect(() => {
     const fetchData = async () => {
-      const { data: memberData } = await supabase.from('members').select('*');
       const { data: groupData } = await supabase.from('groups').select('*');
-      if (memberData) setMembers(memberData as Member[]);
-      if (groupData) setGroups(groupData as Group[]);
+      if (groupData) setGroups(groupData);
+
+      const { data: memberData } = await supabase
+        .from('members')
+        .select('*, groups(name)')
+        .order('created_at', { ascending: false });
+
+      if (memberData) {
+        const mapped = memberData.map((m: any) => ({
+          ...m,
+          group_name: m.groups?.name || '',
+        }));
+        setMembers(mapped);
+      }
     };
+
     fetchData();
   }, []);
 
@@ -56,34 +107,10 @@ export default function MiniCRM() {
     });
   };
 
-  const addMember = async () => {
-    const { name, phone, role, birth, address, affiliation } = form;
-    if (!name || !phone || !role || !birth || !address || !affiliation) return;
-
-    const { error } = await supabase.from('members').insert([form]);
-    if (error) {
-      console.error('등록 에러:', error);
-      return;
-    }
-
-    const { data: newData } = await supabase.from('members').select('*');
-    if (newData) setMembers(newData as Member[]);
-
-    setForm({
-      name: '',
-      phone: '',
-      role: '',
-      birth: '',
-      address: '',
-      affiliation: '',
-      is_member: false,
-    });
-  };
-
   const affiliationStats = useMemo(() => {
     const stats: Record<string, number> = {};
     members.forEach((m) => {
-      const key = m.affiliation;
+      const key = m.group_name || '미지정';
       stats[key] = stats[key] ? stats[key] + 1 : 1;
     });
     return stats;
@@ -100,17 +127,16 @@ export default function MiniCRM() {
           <Input name="role" placeholder="역할 (예: 동책임자)" value={form.role} onChange={handleChange} />
           <Input name="birth" placeholder="생년월일 (예: 830515-2)" value={form.birth} onChange={handleChange} />
           <Input name="address" placeholder="주소 (예: 화순군 화순읍 ...)" value={form.address} onChange={handleChange} />
-          
-          {/* 그룹 선택 드롭다운 */}
+
           <select
-            name="affiliation"
-            value={form.affiliation}
+            name="group_id"
+            value={form.group_id}
             onChange={handleChange}
             className="w-full border rounded p-2"
           >
             <option value="">소속 그룹 선택</option>
             {groups.map((g) => (
-              <option key={g.id} value={g.name}>{g.name}</option>
+              <option key={g.id} value={g.id}>{g.name}</option>
             ))}
           </select>
 
@@ -144,7 +170,7 @@ export default function MiniCRM() {
             <p><strong>역할:</strong> {member.role}</p>
             <p><strong>생년월일:</strong> {member.birth}</p>
             <p><strong>주소:</strong> {member.address}</p>
-            <p><strong>소속:</strong> {member.affiliation}</p>
+            <p><strong>소속:</strong> {member.group_name}</p>
             <p><strong>권리당원:</strong> {member.is_member ? '✅ 예' : '❌ 아니오'}</p>
           </motion.div>
         ))}
