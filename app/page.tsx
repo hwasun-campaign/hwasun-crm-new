@@ -123,7 +123,7 @@ export default function MiniCRM() {
           >
             <option value="">소속 그룹 선택</option>
             {groups.map((g) => (
-              <option key={g.id} value={g.id}>{g.name} 조</option>
+              <option key={g.id} value={g.id}>{g.name} </option>
             ))}
           </select>
 
