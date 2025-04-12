@@ -107,7 +107,6 @@ export default function MiniCRM() {
         <CardContent className="space-y-4 p-4">
           <Input name="name" placeholder="이름" value={form.name} onChange={handleChange} />
           <Input name="phone" placeholder="연락처 (예: 010-1234-5678)" value={form.phone} onChange={handleChange} />
-          <Input name="role" placeholder="역할 (예: 동책임자)" value={form.role} onChange={handleChange} />
           <Input name="birth" placeholder="생년월일 (예: 830515-2)" value={form.birth} onChange={handleChange} />
 
           {/* 주소 입력란: 화순군 고정, 읍/면/동 입력 */}
@@ -116,6 +115,13 @@ export default function MiniCRM() {
             placeholder="주소 (예: 화순군 화순읍 ...)"
             value={`화순군 ${form.address}`}  // 화순군을 고정값으로 추가
             onChange={handleChange}
+          />
+           
+           <Input
+             name="role"
+             placeholder="역할 (예: 동책임자)"
+             value={form.role}
+             onChange={handleChange}
           />
 
           {/* 그룹 선택 드롭다운 */}
