@@ -109,13 +109,17 @@ export default function MiniCRM() {
           <Input name="phone" placeholder="연락처 (예: 010-1234-5678)" value={form.phone} onChange={handleChange} />
           <Input name="birth" placeholder="생년월일 (예: 830515-2)" value={form.birth} onChange={handleChange} />
 
-          {/* 주소 입력란: 화순군 고정, 읍/면/동 입력 */}
-          <Input
-            name="address"
-            placeholder="주소 (예: 화순군 화순읍 ...)"
-            value={`화순군 ${form.address}`}  // 화순군을 고정값으로 추가
-            onChange={handleChange}
-          />
+          {/* 주소 입력란: 화순군 고정 + 읍/면/동 입력 */}
+          <div className="flex items-center space-x-2">
+            <span className="text-gray-700 whitespace-nowrap">화순군</span>
+            <Input
+              name="address"
+              placeholder="읍/면/동 (예: 화순읍 산84-1)"
+              value={form.address}
+              onChange={handleChange}
+              className="flex-1"
+            />
+         </div>
            
            <Input
              name="role"
