@@ -44,10 +44,21 @@ export default function MiniCRM() {
     if (onlyNums.length <= 7) return onlyNums.replace(/(\d{3})(\d{1,4})/, '$1-$2');
     return onlyNums.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
   };
+  // 🆕 생년월일(주민번호 앞자리) 하이픈 처리 함수
+   const formatBirth = (value: string) => {
+   const onlyNums = value.replace(/[^0-9]/g, '');
+   if (onlyNums.length <= 6) return onlyNums;
+   return onlyNums.replace(/(\d{6})(\d{1,7})/, '$1-$2');
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    const newValue = name === 'phone' ? formatPhone(value) : value;
+  
+    const newValue =
+      name === 'phone' ? formatPhone(value)
+      : name === 'birth' ? formatBirth(value)
+      : value;
+  
     setForm({
       ...form,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : newValue,
