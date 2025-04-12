@@ -38,13 +38,14 @@ export default function MiniCRM() {
     is_member: false,
   });
 
+  // 🔢 전화번호 자동 하이픈 처리
   const formatPhone = (value: string) => {
     const onlyNums = value.replace(/[^0-9]/g, '');
     if (onlyNums.length <= 3) return onlyNums;
     if (onlyNums.length <= 7) return onlyNums.replace(/(\d{3})(\d{1,4})/, '$1-$2');
     return onlyNums.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
   };
-
+  // 🆕 생년월일(주민번호 앞자리) 하이픈 처리 함수
   const formatBirth = (value: string) => {
     const onlyNums = value.replace(/[^0-9]/g, '');
     if (onlyNums.length <= 6) return onlyNums;
@@ -53,11 +54,12 @@ export default function MiniCRM() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+  
     const newValue =
       name === 'phone' ? formatPhone(value)
       : name === 'birth' ? formatBirth(value)
       : value;
-
+  
     setForm({
       ...form,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : newValue,
@@ -68,7 +70,11 @@ export default function MiniCRM() {
     const { name, phone, role, birth, address, group_id } = form;
     if (!name || !phone || !role || !birth || !address || !group_id) return;
 
-    const { error } = await supabase.from('members').insert([form]);
+    const fullAddress = `화순군 ${address}`;
+
+    const { error } = await supabase.from('members').insert([
+      { ...form, address: fullAddress },
+    ]);
     if (error) {
       console.error('등록 에러:', error);
       return;
@@ -88,6 +94,7 @@ export default function MiniCRM() {
     });
   };
 
+  // 데이터 불러오기
   useEffect(() => {
     const fetchData = async () => {
       const { data: memberData } = await supabase.from('members').select('*');
@@ -118,19 +125,19 @@ export default function MiniCRM() {
           <Input name="phone" placeholder="연락처 (예: 010-1234-5678)" value={form.phone} onChange={handleChange} />
           <Input name="role" placeholder="역할 (예: 동책임자)" value={form.role} onChange={handleChange} />
           <Input name="birth" placeholder="생년월일 (예: 830515-2)" value={form.birth} onChange={handleChange} />
-          <Input name="address" placeholder="주소 (예: 화순군 화순읍 ...)" value={form.address} onChange={handleChange} />
 
-          <select
-            name="group_id"
-            value={form.group_id}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-          >
-            <option value="">소속 그룹 선택</option>
-            {groups.map((g) => (
-              <option key={g.id} value={g.id}>{g.name}</option>
-            ))}
-          </select>
+          {/* 주소 입력 (화순군 고정, 나머지 입력 가능) */}
+          <div className="flex items-center border rounded px-2 py-1">
+            <span className="whitespace-nowrap text-gray-500">화순군</span>
+            <input
+              type="text"
+              name="address"
+              placeholder="화순읍 중앙로 1"
+              value={form.address}
+              onChange={handleChange}
+              className="flex-1 outline-none px-2"
+            />
+          </div>
 
           <label className="flex items-center space-x-2">
             <Checkbox name="is_member" checked={form.is_member} onChange={handleChange} />
