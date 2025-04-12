@@ -155,3 +155,14 @@ export default function MiniCRM() {
     </div>
   );
 }
+// app/page.tsx
+import MiniCRM from '../components/forms/MiniCRM';
+
+export default function Home() {
+  return (
+    <div>
+      <h1>선거 CRM</h1>
+      <MiniCRM /> {/* 여기서 MiniCRM 컴포넌트를 사용 */}
+    </div>
+  );
+}
