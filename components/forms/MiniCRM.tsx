@@ -111,11 +111,11 @@ export default function MiniCRM() {
           <Input name="birth" placeholder="생년월일 (예: 830515-2)" value={form.birth} onChange={handleChange} />
 
           {/* 주소 입력란: 화순군 고정, 읍/면/동 입력 */}
-          <Input 
-            name="address" 
-            placeholder="주소 (예: 화순군 화순읍 ...)" 
-            value={form.address} 
-            onChange={handleChange} 
+          <Input
+            name="address"
+            placeholder="주소 (예: 화순군 화순읍 ...)"
+            value={`화순군 ${form.address}`}  // 화순군을 고정값으로 추가
+            onChange={handleChange}
           />
 
           {/* 그룹 선택 드롭다운 */}
