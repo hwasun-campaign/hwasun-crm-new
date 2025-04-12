@@ -44,16 +44,30 @@ export default function MiniCRM() {
     if (onlyNums.length <= 7) return onlyNums.replace(/(\d{3})(\d{1,4})/, '$1-$2');
     return onlyNums.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
   };
+  // 🔢 주민번호 자동 하이픈 처리
+  const formatBirth = (value: string) => {
+    const onlyNums = value.replace(/[^0-9]/g, ''); // 숫자만 남기기
+    if (onlyNums.length <= 6) return onlyNums; // 앞자리 6자리까지만 보여줌
+    return onlyNums.replace(/(\d{6})(\d{1})/, '$1-$2'); // 6자리 + 뒷자리
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    const newValue = name === 'phone' ? formatPhone(value) : value;
+  
+    // 하이픈 처리 함수 추가
+    let newValue = value;
+    if (name === 'phone') {
+      newValue = formatPhone(value); // 전화번호 하이픈 처리
+    } else if (name === 'birth') {
+      newValue = formatBirth(value); // 주민번호 하이픈 처리
+    }
+  
+    // 상태 업데이트
     setForm({
       ...form,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : newValue,
     });
   };
-
   const addMember = async () => {
     const { name, phone, role, birth, address, group_id } = form;
     if (!name || !phone || !role || !birth || !address || !group_id) return;
