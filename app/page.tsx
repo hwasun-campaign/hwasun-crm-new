@@ -156,7 +156,7 @@ export default function MiniCRM() {
   );
 }
 // app/page.tsx
-import MiniCRM from '../components/forms/MiniCRM';  // MiniCRM 컴포넌트를 가져옵니다.
+import { MiniCRM } from '../components/forms/MiniCRM';  // MiniCRM을 named export로 임포트
 
 export default function Home() {
   return (

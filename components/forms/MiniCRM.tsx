@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-const MiniCRM = () => {
+export const MiniCRM = () => {  // default export 대신 named export 사용
   const [address, setAddress] = useState('화순군');
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,5 +26,3 @@ const MiniCRM = () => {
     </form>
   );
 };
-
-export default MiniCRM;
