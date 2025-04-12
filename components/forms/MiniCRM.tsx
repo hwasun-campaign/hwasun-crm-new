@@ -101,7 +101,7 @@ export default function MiniCRM() {
 
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-center">선거 조직용 미니 CRM</h1>
+      <h1 className="text-2xl font-bold text-center">화순 선거 조직용 CRM</h1>
 
       <Card>
         <CardContent className="space-y-4 p-4">
@@ -119,7 +119,7 @@ export default function MiniCRM() {
            
            <Input
              name="role"
-             placeholder="역할 (예: 동책임자)"
+             placeholder="역할 (예:책임자, 조직원)"
              value={form.role}
              onChange={handleChange}
           />
