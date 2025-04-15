@@ -124,20 +124,17 @@ export default function MiniCRM() {
           <Input name="birth" placeholder="생년월일 (예: 830515-2)" value={form.birth} onChange={handleChange} />
 
           {/* 주소 입력란: 화순군 텍스트 + 나머지 주소는 Input 칸 */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">주소</label>
-            <div className="flex gap-2 items-center">
-               <span className="text-gray-700 whitespace-nowrap">화순군</span>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-700 whitespace-nowrap">화순군</span>
             <Input
-               name="address"
-               placeholder="읍/면/동, 번지 등 (예: 화순읍 산84-1)"
-               value={form.address}
-               onChange={handleChange}
-               className="flex-1"
+             name="address"
+             placeholder="읍/면/동, 번지 등 (예: 화순읍 산84-1)"
+             value={form.address}
+             onChange={handleChange}
+             className="flex-1"
             />
-           </div>
           </div>
-           
+                     
            <Input
              name="role"
              placeholder="역할 (예:책임자, 조직원)"
