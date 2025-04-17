@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@radix-ui/react-checkbox" // Radix UI Checkbox
 import { Input } from "@/components/ui/input"
 
 export default function PrivacyConsentModal() {
@@ -16,11 +16,21 @@ export default function PrivacyConsentModal() {
     setName(e.target.value)
   }
 
+  // 동의 여부 체크박스 변경 시
+  const handleCheckboxChange = (checked: boolean) => {
+    setAgreed(checked)
+    setOpen(checked) // 동의하면 모달 열기
+  }
+
   return (
     <div className="mt-4">
       {/* 개인정보 수집 동의 체크박스 */}
       <div className="flex items-center space-x-2">
-        <Checkbox id="privacy" onChange={(checked) => setOpen(!!checked)} />
+        <Checkbox 
+          id="privacy" 
+          checked={agreed} 
+          onCheckedChange={handleCheckboxChange} // 체크박스 상태 변경 시
+        />
         <label htmlFor="privacy" className="text-sm cursor-pointer">개인정보 수집 및 이용에 동의합니다</label>
       </div>
 
