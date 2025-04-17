@@ -22,10 +22,10 @@
     "paths": {
       "@/*": [
         "./*"
-      ]
-    "@lib/*": [
-    "components/lib/*"
-     ]  
+      ],
+      "@lib/*": [
+      "components/lib/*"
+       ]  
     },
     "plugins": [
       {

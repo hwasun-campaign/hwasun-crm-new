@@ -1,6 +1,7 @@
+// components/ui/dialog.tsx
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { cn } from "@/lib/utils"; // 이 부분은 utils에서 cn 함수를 가져오는 부분입니다.
+import { cn } from "@/lib/utils";
 
 const Dialog = DialogPrimitive.Root;
 const DialogTrigger = DialogPrimitive.Trigger;
@@ -10,10 +11,10 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Portal>
-    <DialogPrimitive.Overlay className="fixed inset-0 bg-black/50 z-50" />
+    <DialogPrimitive.Overlay className="fixed inset-0 bg-black/50 z-40" />
     <DialogPrimitive.Content
       ref={ref}
-      className={cn("fixed z-50 bg-white p-6 rounded-xl", className)}
+      className={cn("fixed z-50 bg-white p-6 rounded-lg shadow-lg top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2", className)}
       {...props}
     />
   </DialogPrimitive.Portal>
